@@ -1,4 +1,4 @@
-Everything is data. Data is oil.
+intEverything is data. Data is oil.
 
 Computer evoulution speeded up the generation of data, internet make data accessible anywhere anytime. AI is the reflection of the data generated, stored and process. That is why databases and sql are still relevent.
 
@@ -76,3 +76,7 @@ Two tables needed to store such cardinality
 
 Many-Many : Many blogs have millions readers
 Need 3 tables to store such cardinality
+
+**Drawbacks.**
+
+Complex, Expensive, Scalability (Exponentional), Data integrity, Security, Data Migration, Flexibility.
