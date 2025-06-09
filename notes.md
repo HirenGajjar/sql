@@ -1,4 +1,4 @@
-Everything is data. Data is oil. 
+Everything is data. Data is oil.
 
 Computer evoulution speeded up the generation of data, internet make data accessible anywhere anytime. AI is the reflection of the data generated, stored and process. That is why databases and sql are still relevent.
 
@@ -6,10 +6,10 @@ DB are software that stores the data in rational and logical way that helps perf
 
 CRUD is all we do in DB. There can be fancy names - but under the hood it is CRUD.
 
-**Properties of DB.** 
+**Properties of DB.**
 
 1. Integrity - Accuracy + Consistency
-2. Availability - 24 * 7 * 365
+2. Availability - 24 _ 7 _ 365
 3. Security
 4. Independent - Any data and DB should be independent of application and devices.
 5. Concurrancy - Parallely able to serve N numbers of request.
@@ -45,4 +45,34 @@ A DBMS is an interface and intermediate platform between user and user's data, w
 
 Data is stored on Hardware - Hardware is access by OS - DBMS is connection between user and OS. OS is connection between Hardware and user.
 
-*Data managemnt, Integrity (acuraccy), security (authority etc),Concurrency, Transcation (Either modification are completed or not triggered at all), Utilites(Data import export, user managment, backps, logging etc).*
+_Data managemnt, Integrity (acuraccy), security (authority etc),Concurrency, Transcation (Either modification are completed or not triggered at all), Utilites(Data import export, user managment, backps, logging etc)._
+
+**Database Keys.**
+
+**Key -** it is an attribute or set of attributes that uniquely identifies a specific row/tuple in a table.
+Basically something in a each row that is completly uniuqe in that table.
+Helps maintaining integrity and reliability.
+
+1. Super key - combination of column to identify perticular row.
+2. Candidate key - a way to identify a row uniquly with minimum combination of attributes without redundant attribute(something that is not needed or useful)
+3. Primary key - The one and only unique key that is totally unique to identify that row in table that has no null value. NOT NULL. NO DUPLICATE. Prefered is small, numerical, constant.
+4. Alternate key - second prefered primary key
+5. Composite key - A combo of two or more attributes.
+6. Surrogate key - certain situations that has no combination that can be a key so we add new column that acts as a Surrogate key. (Primary key in majboori)
+7. Foreign Key - A primary key in one table being used in another one known as a foreign key.
+8. Compound Key
+
+**Cardinality of Relationship.**
+
+Entity - something that we can make a table like name , number or email etc.
+
+Entities of one table can connect to entities of another table - that occurance of relation - the number is known as a cardinality.
+
+1-1 : Me and my DNA
+Need only One table to store such cardinality
+
+1-Many : One blog -million readers
+Two tables needed to store such cardinality
+
+Many-Many : Many blogs have millions readers
+Need 3 tables to store such cardinality
