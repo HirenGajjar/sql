@@ -2,7 +2,7 @@ Database server - DBMS - control DBs
 
 DBs - Tables - Rows and cols
 
-**SQL - structured query language - language to manage and manipulate RDBMS - allows to do CRUD operations.**
+**SQL - structured query language - language to manage and manipulate RDBMS - allows to do CRUD operations.** 
 
 1. DDL - Data defination Language - CREATE ALTER DROP TRUNCATE
 2. DCL - Data control Language - GRANT REVOKE
@@ -11,17 +11,21 @@ DBs - Tables - Rows and cols
 
 ---
 
+
+
 ```sql
 CREATE TABLE campusx;
 ```
 
-but standard practice is
+ but standard practice is 
 
 ```sql
 CREATE DATABASE IF NOT EXISTS campusx;
 ```
 
 ---
+
+
 
 ```sql
 DROP DATABASE campusx;
@@ -32,6 +36,7 @@ but standard practice is
 ```sql
 DROP DATABASE IF EXISTS campusx;
 ```
+
 
 ---
 
@@ -60,7 +65,7 @@ Here if exists does not works (atleast not in myphpadmin)
 
 ---
 
-How to delete a table
+How to delete a table 
 
 ```sql
 DROP TABLE IF EXISTS my_table;
@@ -70,7 +75,7 @@ Be very carefull while dropping or truncating a table - all the time ⚠
 
 ---
 
-_Data Integrity : accuracy + completeness + consistency = It is to measure a relibility and trustworthiness of the data, dbms and application from errors, corruption and unauthrized access._
+*Data Integrity : accuracy + completeness + consistency = It is to measure a relibility and trustworthiness of the data, dbms and application from errors, corruption and unauthrized access.*
 
 1. Constrains (Rules) - conditions
 2. Transactions - Example of Bank transactions - a unit of work either executed whole or not at all.
@@ -90,9 +95,9 @@ _Data Integrity : accuracy + completeness + consistency = It is to measure a rel
 
 ```sql
 CREATE TABLE users (
-user_id INT NOT NULL,
-user_name VARCHAR(255) NOT NULL,
-user_email VARCHAR(255) NOT NULL,
+user_id INT NOT NULL, 
+user_name VARCHAR(255) NOT NULL, 
+user_email VARCHAR(255) NOT NULL, 
 user_password VARHCAR(255) NOT NULL
 )
 ```
@@ -105,6 +110,7 @@ user_email VARCHAR(255) NOT NULL UNIQUE,
 user_password VARCHAR(255) NOT NULL
 );
 ```
+
 
 ---
 
@@ -129,3 +135,31 @@ CONSTRAINT users_user_email_user_name_unique UNIQUE(user_email,user_name)
 The good practice here to follow is while creating a constraint user table name first, then column names and then the constraint like users_user_email_user_name_unique(user_email,user_name).
 
 It helps if in future where you need to remove the constraint only so you dont have to delete whole row or column , rather just remove that constraint.
+
+---
+
+```sql
+CREATE TABLE IF NOT EXISTS users(
+user_id INT NOT NULL PRIMARY KEY,
+user_name VARCHAR(255) NOT NULL,
+user_email VARCHAR(255) NOT NULL,
+user_password VARCHAR(255) NOT NULL,
+CONSTRAINT users_user_email_user_name_unique UNIQUE(user_email,user_name)
+);
+```
+
+There is another way to declare a primary key in a table
+
+```sql
+CREATE TABLE IF NOT EXISTS users(
+user_id INT NOT NULL,
+user_name VARCHAR(255) NOT NULL,
+user_email VARHCAR(255) NOT NULL,
+user_password VARCHAR(255) NOT NULL,
+
+CONSTARINT users_user_email_user_name_unique UNIQUE(user_email,user_name),
+CONSTRAINT users_user_id_primary_key PRIMARY KEY (user_id)
+ );
+```
+
+Why we need the second way ? - In many situations where there is no single column that is meeting all the requirements for being a primary key - then we need second way to do it, where we can make it. And second use case is we can give name to constraints - and we dont have to do directly to the attributes. At 58:00 Session 31
