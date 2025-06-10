@@ -163,3 +163,94 @@ CONSTRAINT users_user_id_primary_key PRIMARY KEY (user_id)
 ```
 
 Why we need the second way ? - In many situations where there is no single column that is meeting all the requirements for being a primary key - then we need second way to do it, where we can make it. And second use case is we can give name to constraints - and we dont have to do directly to the attributes. At 58:00 Session 31
+
+---
+
+```sql
+CREATE TABLE IF NOT EXISTS users(
+user_id INT PRIMARY KEY AUTO_INCREMENT,
+user_name VARCHAR(255) NOT NULL,
+user_email VARCHAR(255) NOT NULL UNIQUE,
+user_password VARCHAR(255) NOT NULL
+);
+```
+
+
+---
+
+The next one is CHECK - let say in a table called student we only allowed student under 20 and over 6 - then we can use CHECK
+
+```sql
+CREATE TABLE IF NOT EXISTS students(
+students_id INT PRIMARY KEY AUTO_INCREMENT,
+students_name VARCHAR(255) NOT NULL,
+students_age INT NOT NULL CHECK(students_age > 6 AND students_age < 20)
+);
+```
+
+Another way is to user constraint keyword.
+
+```sql
+CREATE TABLE IF NOT EXISTS students(
+student_id INT PRIMARY KEY AUTO_INCREMENT,
+student_name VARCHAR(255) NOT NULL,
+student_age INT NOT NULL,
+CONSTRAINT students_student_age_check CHECK(student_age > 6 AND student_age < 20)
+);
+```
+
+
+---
+
+In mysql - we cannot define DEFAULT to any column using CONSTRAINT - we have to do it right away when we create that column
+
+```sql
+CREATE TABLE IF NOT EXISTS trial(
+trial_id INT PRIMARY KEY AUTO_INCREMENT,
+trial_name VARCHAR(255) NOT NULL,
+trial_country VARCHAR(255) NOT NULL DEFAULT "INDIA"
+);
+```
+
+
+---
+
+Let say we created a table called customers - that has 
+
+```sql
+CREATE TABLE IF NOT EXISTS customers (
+c_id INT PRIMARY KEY AUTO_INCREMENT,
+c_name VARCHAR(255) NOT NULL,
+c_email VARCHAR(255) UNIQUE NOT NULL
+);
+```
+
+Here we have Primary key of table which is c_id
+
+Now we have another table called orders
+
+```sql
+CREATE TABLE IF NOT EXISTS orders(
+o_id INT PRIMARY KEY AUTO_INCREMENT,
+o_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+cid INT NOT NULL,
+
+CONSTRAINT orders_foreign_key FOREIGN KEY (cid) REFERENCES customers(c_id)
+);
+```
+
+Here the order tables have primary key o_id , and cid in customer table is a column that has a references from customer table with primary key c_id - that is why we used constraint that helps us creating foreign key in order table.
+
+The Biggest Benifit of having a foreign key is if we try to drop a customer table while order table still exists then it wont let us do that because we have relation between those two table using foreign key.
+
+Not only that but let say if we have two customers data in customer table - one that has made an order and one has not. Then now if we try to simply delete the cutomer with order - we will not be able to do - for that we need to delete the order it self first. But the cutomer without any order can be deleted from cutomers table.
+
+---
+
+In short all of the above 7 constraints we learn are here to maintain data integrity - with refrencial actions.
+REFRENCIAL ACTION - While manipulating one table - what will be the effects on the releted tables is called RA.
+
+The refrencial actions contains RESTRICT, CASCADE, SET NULL and SET DEFAULT.
+
+The default nature of SQL in most cases is restrict - that means do not allow any manipulation in related tables.
+Cascade on the other hand, if we create cascade in columns then change in parent table (where cascade is defined) will reflect in child table as well.
