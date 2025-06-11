@@ -358,8 +358,8 @@ ALTER TABLE customers ADD COLUMN IF NOT EXISTS middle_name VARCHAR(255) NOT NULL
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS middle_name VARCHAR(255) NOT NULL FIRST;
 ```
 
-| Subcommand                      | Use Case                                              | What It Does                                                  | Example                                                                                        |
-| ------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Subcommand                        | Use Case                                              | What It Does                                                  | Example                                                                                          |
+| --------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `ADD COLUMN`                    | Add a new column to the table                         | Adds a column with specified name, type, and optional default | `ALTER TABLE users ADD COLUMN age INT DEFAULT 18;`                                             |
 | `DROP COLUMN`                   | Remove a column                                       | Deletes the column and all its data                           | `ALTER TABLE users DROP COLUMN age;`                                                           |
 | `MODIFY COLUMN`                 | Change data type, default, or constraints (MySQL)     | Alters column's type or default value                         | `ALTER TABLE users MODIFY COLUMN name VARCHAR(100) NOT NULL;`                                  |
@@ -384,3 +384,9 @@ ADD NEW COLUMND IF NOT EXISTS joining_date DATETIME NOT NULL DEFAULT CURRENT_TIM
 ```
 
 We can also add and delete constraint.
+
+```sql
+ALTER TABLE orders CHANGE COLUMN o_id order_id INT;
+```
+
+To change the column name there is a wierd syntax of CHANGE COLUMN then original name followed by new name and the data type. Here data type is very important.
