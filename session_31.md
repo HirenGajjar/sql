@@ -350,6 +350,14 @@ ALTER TABLE customers DROP COLUMN IF EXISTS password;
 ALTER TABLE customers ALTER COLUMN IF EXISTS passoword SET DEFAULT "1234";
 ```
 
+```sql
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS middle_name VARCHAR(255) NOT NULL AFTER c_name;
+```
+
+```sql
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS middle_name VARCHAR(255) NOT NULL FIRST;
+```
+
 | Subcommand                      | Use Case                                              | What It Does                                                  | Example                                                                                        |
 | ------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `ADD COLUMN`                    | Add a new column to the table                         | Adds a column with specified name, type, and optional default | `ALTER TABLE users ADD COLUMN age INT DEFAULT 18;`                                             |
@@ -368,3 +376,11 @@ ALTER TABLE customers ALTER COLUMN IF EXISTS passoword SET DEFAULT "1234";
 | `ADD UNIQUE`                    | Enforce unique values in column(s)                    | Prevents duplicate entries                                    | `ALTER TABLE users ADD UNIQUE (email);`                                                        |
 | `ADD INDEX`                     | Add an index to improve performance                   | Speeds up queries on the column                               | `ALTER TABLE users ADD INDEX (email);`                                                         |
 | `DROP INDEX`                    | Remove an index                                       | Deletes the index                                             | `ALTER TABLE users DROP INDEX email;`                                                          |
+
+```sql
+ALTER TABLE customers
+ADD NEW COLUMN IF NOT EXISTS sin_number INT,
+ADD NEW COLUMND IF NOT EXISTS joining_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+```
+
+We can also add and delete constraint.
