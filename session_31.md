@@ -2,7 +2,7 @@ Database server - DBMS - control DBs
 
 DBs - Tables - Rows and cols
 
-### **SQL - structured query language - language to manage and manipulate RDBMS - allows to do CRUD operations.** 
+### **SQL - structured query language - language to manage and manipulate RDBMS - allows to do CRUD operations.**
 
 1. DDL - Data defination Language - CREATE ALTER DROP TRUNCATE
 2. DCL - Data control Language - GRANT REVOKE
@@ -11,21 +11,17 @@ DBs - Tables - Rows and cols
 
 ---
 
-
-
 ```sql
 CREATE TABLE campusx;
 ```
 
- but standard practice is 
+but standard practice is
 
 ```sql
 CREATE DATABASE IF NOT EXISTS campusx;
 ```
 
 ---
-
-
 
 ```sql
 DROP DATABASE campusx;
@@ -36,7 +32,6 @@ but standard practice is
 ```sql
 DROP DATABASE IF EXISTS campusx;
 ```
-
 
 ---
 
@@ -65,7 +60,7 @@ Here if exists does not works (atleast not in myphpadmin)
 
 ---
 
-How to delete a table 
+How to delete a table
 
 ```sql
 DROP TABLE IF EXISTS my_table;
@@ -75,7 +70,7 @@ Be very carefull while dropping or truncating a table - all the time ⚠
 
 ---
 
-*Data Integrity : accuracy + completeness + consistency = It is to measure a relibility and trustworthiness of the data, dbms and application from errors, corruption and unauthrized access.*
+_Data Integrity : accuracy + completeness + consistency = It is to measure a relibility and trustworthiness of the data, dbms and application from errors, corruption and unauthrized access._
 
 1. Constrains (Rules) - conditions
 2. Transactions - Example of Bank transactions - a unit of work either executed whole or not at all.
@@ -85,7 +80,7 @@ Be very carefull while dropping or truncating a table - all the time ⚠
 
 ### **Constrains**
 
-1. NOT NULL  - cannot be null
+1. NOT NULL - cannot be null
 2. UNIQUE - have to be unique for each row
 3. PRIMARY KEY - Unique, not null
 4. AUTO INCREAMENT - incerases by 1. Generally int values
@@ -95,9 +90,9 @@ Be very carefull while dropping or truncating a table - all the time ⚠
 
 ```sql
 CREATE TABLE users (
-user_id INT NOT NULL, 
-user_name VARCHAR(255) NOT NULL, 
-user_email VARCHAR(255) NOT NULL, 
+user_id INT NOT NULL,
+user_name VARCHAR(255) NOT NULL,
+user_email VARCHAR(255) NOT NULL,
 user_password VARHCAR(255) NOT NULL
 )
 ```
@@ -110,7 +105,6 @@ user_email VARCHAR(255) NOT NULL UNIQUE,
 user_password VARCHAR(255) NOT NULL
 );
 ```
-
 
 ---
 
@@ -175,7 +169,6 @@ user_password VARCHAR(255) NOT NULL
 );
 ```
 
-
 ---
 
 The next one is CHECK - let say in a table called student we only allowed student under 20 and over 6 - then we can use CHECK
@@ -199,7 +192,6 @@ CONSTRAINT students_student_age_check CHECK(student_age > 6 AND student_age < 20
 );
 ```
 
-
 ---
 
 In mysql - we cannot define DEFAULT to any column using CONSTRAINT - we have to do it right away when we create that column
@@ -212,10 +204,9 @@ trial_country VARCHAR(255) NOT NULL DEFAULT "INDIA"
 );
 ```
 
-
 ---
 
-Let say we created a table called customers - that has 
+Let say we created a table called customers - that has
 
 ```sql
 CREATE TABLE IF NOT EXISTS customers (
@@ -333,3 +324,47 @@ ON DELETE SET DEFAULT "No DATA Avilable"
 ```
 
 ⚠⚠⚠⚠ Here we have similar issue - as we have set c_id INT and we are trying to use set default with string value which makes it invalid.
+
+---
+
+### Alter commnad
+
+Alter allows to alter the structure of the perticular existing table.
+
+1. Add new column (ADD)
+2. Drop existing column (DROP)
+3. Rename existing column (RENAME)
+4. Change data type (MODIFY)
+5. Set Default - use alter inside alter
+6. and more
+
+```sql
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS password VARCHAR(255) NOT NULL;
+```
+
+```sql
+ALTER TABLE customers DROP COLUMN IF EXISTS password;
+```
+
+```sql
+ALTER TABLE customers ALTER COLUMN IF EXISTS passoword SET DEFAULT "1234";
+```
+
+| Subcommand                      | Use Case                                              | What It Does                                                  | Example                                                                                        |
+| ------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `ADD COLUMN`                    | Add a new column to the table                         | Adds a column with specified name, type, and optional default | `ALTER TABLE users ADD COLUMN age INT DEFAULT 18;`                                             |
+| `DROP COLUMN`                   | Remove a column                                       | Deletes the column and all its data                           | `ALTER TABLE users DROP COLUMN age;`                                                           |
+| `MODIFY COLUMN`                 | Change data type, default, or constraints (MySQL)     | Alters column's type or default value                         | `ALTER TABLE users MODIFY COLUMN name VARCHAR(100) NOT NULL;`                                  |
+| `CHANGE COLUMN`                 | Rename column and change its type (MySQL only)        | Renames and modifies column in one go                         | `ALTER TABLE users CHANGE COLUMN name full_name VARCHAR(100);`                                 |
+| `ALTER COLUMN ... SET DEFAULT`  | Set default value for a column (MySQL 8+, PostgreSQL) | Sets a new default for the column                             | `ALTER TABLE users ALTER COLUMN age SET DEFAULT 21;`                                           |
+| `ALTER COLUMN ... DROP DEFAULT` | Remove default value                                  | Removes the default assigned to the column                    | `ALTER TABLE users ALTER COLUMN age DROP DEFAULT;`                                             |
+| `ALTER COLUMN ... TYPE`         | Change data type (PostgreSQL)                         | Changes the column type                                       | `ALTER TABLE users ALTER COLUMN age TYPE SMALLINT;`                                            |
+| `RENAME COLUMN`                 | Rename a column (MySQL 8.0+, PostgreSQL)              | Changes the column name only                                  | `ALTER TABLE users RENAME COLUMN name TO username;`                                            |
+| `RENAME TO`                     | Rename a table                                        | Changes the name of the entire table                          | `ALTER TABLE users RENAME TO customers;`                                                       |
+| `ADD CONSTRAINT`                | Add a constraint (e.g., foreign key, unique)          | Adds a named constraint to the table                          | `ALTER TABLE orders ADD CONSTRAINT fk_customer FOREIGN KEY (c_id) REFERENCES customers(c_id);` |
+| `DROP CONSTRAINT`               | Remove a constraint (PostgreSQL)                      | Drops a named constraint                                      | `ALTER TABLE orders DROP CONSTRAINT fk_customer;`                                              |
+| `ADD PRIMARY KEY`               | Add primary key after table creation                  | Assigns one or more columns as primary                        | `ALTER TABLE users ADD PRIMARY KEY (user_id);`                                                 |
+| `DROP PRIMARY KEY`              | Remove primary key (MySQL only)                       | Removes the primary key from the table                        | `ALTER TABLE users DROP PRIMARY KEY;`                                                          |
+| `ADD UNIQUE`                    | Enforce unique values in column(s)                    | Prevents duplicate entries                                    | `ALTER TABLE users ADD UNIQUE (email);`                                                        |
+| `ADD INDEX`                     | Add an index to improve performance                   | Speeds up queries on the column                               | `ALTER TABLE users ADD INDEX (email);`                                                         |
+| `DROP INDEX`                    | Remove an index                                       | Deletes the index                                             | `ALTER TABLE users DROP INDEX email;`                                                          |
