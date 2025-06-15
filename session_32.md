@@ -126,6 +126,8 @@ As here < > will exclude the number we gave in the range whereas between will in
 
 ### IN and NOT IN
 
+IN will check the values we provide and not as the range. Like if i have to check 10, 20 and 25 then using IN it will check only those values.
+
 Q. Find me smartphones which has processor of snapdragon ,exynos and bionic ? - It can be done with OR operaiton or IN function.
 
 ```sql
@@ -319,6 +321,14 @@ FROM campusx.smartphones;
 ```
 
 ---
+
+⚠⚠⚠⚠
+
+There is a clear difference between IN and BETWEEN
+
+IN checks the very specific values that given and not the range between them as it can take string as a input.
+
+BETWEEN works like a range - checks the all the values between and including the given values.
 
 ---
 
