@@ -172,3 +172,109 @@ FROM database_name.table_name;
 ```
 
 ## JOINS
+
+Inner joins - Outer Joins and Self Joins
+
+_Joins can be done between table using the columns that have same values (not necessarily having same column name)_
+
+##### Inner Join
+
+Returns the rows that are same in both columns of all tables that we joined.
+
+```sql
+SELECT *
+FROM practice.employee_demographics
+JOIN practice.employee_salary
+ON practice.employee_demographics.employee_id = practice.employee_salary.employee_id;
+```
+
+Here we will get all the rows that have same values based on the column we specified in ON operator which is employee_id here. Remember not all the values. Only those who have the same values in provided column in both of the tables.
+
+Now here one thing to note is that since we are trying to get all the columns once we created the join. But what happen if we want to get very specific columns from each table. Then we simply need to give the table_name.column_name instead of directly writing column_name in select statment. Here is how, also we will use Aliasing to simplify the code little bit.
+
+```sql
+SELECT em_de.first_name, em_de.last_name, em_de.salary
+FROM practice.employee_demographics AS em_de
+JOIN practice.employee_salary AS em_sa
+ON em_de.employee_id = em_sa.employee_id
+```
+
+##### Outer Joins
+
+###### Left Outer / LEFT join
+
+Take everything from the left table and compare to the next table.
+
+```sql
+SELECT *
+FROM practice.employee_demographics AS em_de
+LEFT JOIN practice.employee_salary AS em_sa
+ON em_de.employee_id = em_sa.employee_id;
+```
+
+###### RIGHT JOIN / RIGHT OUTER JOIN
+
+Take everything from the right table and compare to the next table.
+
+```sql
+SELECT *
+FROM practice.employee_demographics AS em_de
+RIGHT JOIN practice.employee_salary AS em_sa
+ON em_de.employee_id = em_sa.employee_id;
+```
+
+---
+
+_Notes for JOIN in broader view_
+
+let say i have table A that has 10 rows and table B has 10 rows
+
+A and B has 7 matching rows with one column that is for table A - a_id and for B - b_id
+
+so i do inner join - "I only get those 7 matching values rows using a_id and b_id"
+if i do left join - "I get all the 10 rows of A and null in place for B"
+if i do right join "I got all the 10 rows of B and NULL for in place of A"
+
+---
+
+##### SELF Join
+
+Joining the table to it self.
+
+```sql
+SELECT *
+FROM database_name.the_only_table as table_as_one
+JOIN database_name.the_only_table as table_as_two
+ON table_as_one.column_name = table_as_two.column_name;
+```
+
+##### Joining Multiple Tables
+
+Consider the following task : For Parks and Recreation Database, we need first name ,last name , employee id ,salary and department for each employee.
+
+Note here that the firt table employee_demographics has one value missing - id 2.
+
+```sql
+SELECT *
+FROM practice.employee_demographics AS em_de
+RIGHT JOIN practice.employee_salary AS em_sa
+ON em_de.employee_id = em_sa.employee_id
+JOIN practice.parks_departments AS pa_de
+ON em_sa.dept_id = pa_de.dept_id;
+```
+
+The above query will get all the values. And here we will have two options to get first name and last name, either from demographics table or salary table but we choose salary table as choosing from demographics table will give NULL values for id - 2.
+
+```sql
+SELECT em_de.employee_id AS "Employee ID",
+em_sa.first_name AS "Employee First Name",
+em_sa.last_name AS "Employee Last Name",
+em_de.age AS "Employee Age",
+em_sa.salary "Employee Salary",
+pa_de.department_name AS "Employee Department"
+FROM practice.employee_demographics AS em_de
+RIGHT JOIN practice.employee_salary AS em_sa
+ON em_de.employee_id = em_sa.employee_id
+JOIN practice.parks_departments AS pa_de
+ON em_sa.dept_id = pa_de.department_id;
+```
