@@ -21,6 +21,7 @@ A = {1,2} and B = {3,4} Then Cartesian product A x B = (1,3),(1,4),(2,3),(2,4)
 
 Syntax - Here JOIN or INNER JOIN is same thing.
 
+**_ONLY RETURNS THE ROWS THAT HAS THE SAME VALUES IN BOTH OF THE TABLE._**
 
 ```sql
 SELECT Column
