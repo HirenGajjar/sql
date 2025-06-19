@@ -278,3 +278,124 @@ ON em_de.employee_id = em_sa.employee_id
 JOIN practice.parks_departments AS pa_de
 ON em_sa.dept_id = pa_de.department_id;
 ```
+
+## UNIONS
+
+##### Union
+
+By default UNION is UNION DISTINCT
+
+```sql
+SELECT first_name,last_name
+FROM employee_demographics
+UNION
+SELECT first_name,last_name
+FROM employee_salary;
+```
+
+## String Functions
+
+Build in functions to work with strings.
+
+#### LENGTH()
+
+```sql
+SELECT LENGTH("Hiren");
+```
+
+#### UPPER()
+
+```sql
+SELECT UPPER('hiren');
+```
+
+#### LOWER()
+
+```sql
+SELECT LOWER('HIREN');
+```
+
+#### TRIM
+
+##### TRIM - Normal
+
+```sql
+SELECT TRIM('     hiren           ');
+```
+
+##### TRIM LEFT
+
+```sql
+SELECT LTRIM('     hiren    ');
+```
+
+##### TRIM RIGHT
+
+```sql
+SELECT RTRIM('            hiren                ');
+```
+
+#### LEFT()
+
+Let say in with name column we need to create a sort sub name, for an example Name Chris should have 3 charactres in new column as 'Chr' and so on.
+
+```sql
+SELECT first_name , 
+LEFT(first_name,3)
+FROM employee_demographics;
+```
+
+Similarly, if we provide the value 1 in LEFT - it will give us the first character from LEFT.
+
+#### RIGHT()
+
+Let say we need last two characters of last name from demographics table.
+
+```sql
+SELECT last_name , 
+RIGHT(last_name,2)
+FROM employee_demographics;
+```
+
+#### SUBSTRING()
+
+Syntax - SUBSTRING(column_name, first , length)
+
+```sql
+SELECT first_name,
+SUBSTRING(last_name, 2,2)
+FROM employee_demographics;
+```
+
+Start at 2 and go for 3 (2 and 3 basically).
+
+Q.FInd out the month from the date of birth column ?
+
+```sql
+SELECT birth_date,
+SUBSTRING(birth_date,6,2) AS "Month"
+FROM employee_demographics;
+```
+
+#### REPLACE()
+
+Q. Replace - in date of birth column to / 
+
+```sql
+SELECT birth_date,
+REPLACE(birth_date,'-','/')
+FROM employee_demographics;
+```
+
+#### LOCATE()
+
+To find something in the string. It provides the location of the given character of string in searched string.
+
+Q. FInd i in 'Hiren'
+
+```sql
+SELECT 
+LOCATE('i','Hiren');
+```
+
+It will give answer as 2 as we said find 'i' in 'Hiren' which is at 2nd postition (starting from 1-H, 2-i....)
