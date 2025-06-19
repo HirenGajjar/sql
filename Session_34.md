@@ -46,3 +46,22 @@ ON t1.column = t2.column;
 ### SELF Join - Table joined itself
 
 Same table is tretated as a two tables. It is useful to compare rows of same table.
+
+---
+
+let say i have two tables A and B
+
+then if i consider A on left and B on right and do all the joins inner ,left ,right ,full outer
+
+and then
+if i consider B on left and A on right and do all the joins inner ,left ,right ,full outer
+
+would my answer same ?
+
+----- NO , INNER and OUTER Join will have same outputs but left and right would be different.
+
+A LEFT JOIN B ≡ B RIGHT JOIN A
+
+![1750359383082](image/Session_34/1750359383082.png)
+
+---

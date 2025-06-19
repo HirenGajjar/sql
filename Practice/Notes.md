@@ -429,3 +429,64 @@ ELSE 'Above30'
 END AS 'age_categories'
 FROM employee_demoraphics;
 ```
+
+## SUB Queries
+
+Query within another query.
+
+⚠⚠⚠⚠⚠
+
+Let say we want to find out the employees in demographics table that works in dept_id = 1 or parks and recreation department without using joins ? How ? Using sub queries.
+
+Before we impliment whole subquery - we will just find out the dept_id = 1 in salary table for all the employess.
+
+```sql
+SELECT employee_id
+FROM employee_salary
+WHERE dept_id = 1;
+```
+
+This will give us a single column table where we will have id of all the employess in dept - 1, the same query we can use inside another query which will give us other details of employee. Here is how
+
+```sql
+SELECT *
+FROM employee_id
+WHERE employee_id
+IN(
+SELECT employee_id
+FROM employee_salary
+WHERE dept_id = 1
+);
+```
+
+Q.2. Let say we need an output from salary table with - first name ,last name ,salary and average of all the employee's salary using sub queries
+
+```sql
+SELECT first_name, last_name ,
+(SELECT AVG(salary)
+FROM employee_salary
+)
+AS 'average_salary'
+FROM employee_salary
+GROUP BY first_name,last_name,salary
+;
+```
+
+⚠⚠⚠⚠⚠⚠ 1:39:00 - 1:46:00
+
+```sql
+SELECT AVG(ave_age) ,
+AVG(max_age),
+AVG(min_age),
+AVG(count_age)
+FROM
+(
+SELECT gender ,
+AVG(age) AS ave_age,
+MAX(age) AS max_age,
+MIN(age) AS min_age,
+COUNT(age) AS count_age
+FROM employee_demographics
+GROUP BY gender
+)AS aggregate_table;
+```
