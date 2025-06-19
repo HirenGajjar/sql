@@ -56,3 +56,10 @@ LOCATE('i','Hiren');
 SELECT first_name ,
 LOCATE('is',first_name)
 FROM employee_demographics;
+
+-- CONCAT
+
+SELECT first_name , last_name,
+CONCAT(first_name,' ',last_name) AS "full_name"
+FROM employee_demographics;
+

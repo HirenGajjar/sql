@@ -340,7 +340,7 @@ SELECT RTRIM('            hiren                ');
 Let say in with name column we need to create a sort sub name, for an example Name Chris should have 3 charactres in new column as 'Chr' and so on.
 
 ```sql
-SELECT first_name , 
+SELECT first_name ,
 LEFT(first_name,3)
 FROM employee_demographics;
 ```
@@ -352,7 +352,7 @@ Similarly, if we provide the value 1 in LEFT - it will give us the first charact
 Let say we need last two characters of last name from demographics table.
 
 ```sql
-SELECT last_name , 
+SELECT last_name ,
 RIGHT(last_name,2)
 FROM employee_demographics;
 ```
@@ -379,7 +379,7 @@ FROM employee_demographics;
 
 #### REPLACE()
 
-Q. Replace - in date of birth column to / 
+Q. Replace - in date of birth column to /
 
 ```sql
 SELECT birth_date,
@@ -394,8 +394,38 @@ To find something in the string. It provides the location of the given character
 Q. FInd i in 'Hiren'
 
 ```sql
-SELECT 
+SELECT
 LOCATE('i','Hiren');
 ```
 
 It will give answer as 2 as we said find 'i' in 'Hiren' which is at 2nd postition (starting from 1-H, 2-i....)
+
+#### CONCAT()
+
+Q.Make a first name and last name as full name.
+
+```sql
+SELECT first_name,last_name,
+CONCAT(first_name,' ',last_name)
+FROM employee_demographics;
+```
+
+## CASE Statments
+
+It allows to use logic in SELECT statment.
+
+**_CASE WHEN THEN ELSE END_**
+
+We can do muliple CASE in same query.
+
+Q. Find people under 30 in demographics table and call them unde30 and for the rest call above30 ?
+
+```sql
+SELECT first_name, last_name, age,
+CASE
+WHEN age <= 30
+THEN 'Under30'
+ELSE 'Above30'
+END AS 'age_categories'
+FROM employee_demoraphics;
+```
