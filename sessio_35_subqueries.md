@@ -2,21 +2,36 @@
 
 A query with in a query is a sub query.
 
-***The Subquery is executed first.***
+a subquery is simply a SELECT statement that is nested inside another SQL statement such as: SELECT, INSERT, UPDATE, DELETE.
+
+**_The Subquery is executed first._**
+
+```sql
+SELECT *
+FROM movies
+WHERE score > (
+SELECT
+MAX(score)
+FROM movies
+);
+```
+
+In the above code the scope of the subquery or the inner query is only until the outer query is present. Once the outer query is gone, inner query is gone.
 
 There is mainly INNER QUERY that executed first - The result of INNER QUERY is given to OUTER QUERY.
 
 Types of Subquery. (based on what inner query returns or based on execution)
 
-* Based on what it returns
+- Based on what it returns
 
-  * Scaler Subquery
-  * Row Subquery
-  * Table Subquery
-* Based on execution
+  - Scaler Subquery (1 Row X 1 Column)
+  - Row Subquery (Multiple Rows X 1 Column)
+  - Table Subquery (Multiple Rows X Multiple Column)
 
-  * Independent Subquery
-  * Correlated Subquery
+- Based on execution
+
+  - Independent Subquery / Non-correlated Query
+  - Correlated Subquery
 
 ⚠⚠⚠⚠
 
@@ -55,7 +70,7 @@ Multiple Rows - Multiple Columns Results.
 
 ### Independent Subquery - Scaler value
 
-Let say we need to find out the movie with highest profit from the given Data.
+Q.1. Let say we need to find out the movie with highest profit from the given Data.
 
 First we can do it using simply ORDER BY.
 
@@ -71,6 +86,66 @@ Same problem can be solve using subquery.
 SELECT *
 FROM movies
 WHERE (gross - profit ) = (SELECT MAX(gross - profit) FROM Movies);
+```
+
+Q.2. Find the movie in year 2000 that has the highest score
+
+```sql
+SELECT *
+FROM movies
+WHERE year = 2000
+AND
+score =
+(
+SELECT MAX(score)
+FROM movies
+WHERE year =2000
+);
+```
+
+Now here something to note - we have used the year = 2000 condition twice. Why ? It is because it is a independent subquery that means the inner query's result does not have anything to do with the outer query, it will simply give use the single value of MAX(score) and for the outer query we need to check the condition again.
+
+Q.3. Find the movies that has the higher score then the average score for the whole dataset
+
+Find the average score for the dataset
+
+```sql
+SELECT
+AVG(score)
+FROM movies;
+```
+
+Now use that to filter
+
+```sql
+SELECT *
+FROM movies
+WHERE score > (
+SELECT
+AVG(score)
+FROM movies
+);
+```
+
+Q.4. Find the movies that has the highest score where the votes are > then the average votes for the dataset
+
+Find the average votes for the whole dataset
+
+```sql
+SELECT
+AVG(votes)
+FROM movies;
+```
+
+Using the above result compare and oreder the result to DESC LIMIT 1
+
+```sql
+SELECT *
+FROM movies
+WHERE votes >
+(SELECT AVG(votes)
+FROM movies)
+ORDER BY score DESC LIMIT 1;
 ```
 
 ---

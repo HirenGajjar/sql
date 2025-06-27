@@ -23,6 +23,34 @@ INSERT INTO marks (name,branch,marks)VALUES
 ('Prashant','MECH',75),
 ('Amit','MECH',69),
 ('Sunny','MECH',39),
-('Gautam','MECH',51)
+('Gautam','MECH',51);
 
---
+SELECT *
+FROM marks;
+
+
+SELECT *,
+AVG(marks) OVER(PARTITION BY branch)
+FROM marks;
+
+SELECT * ,
+MIN(marks) OVER() AS 'overall_min',
+MAX(marks) OVER() AS 'overall_max',
+AVG(marks) OVER() AS 'overall_avg',
+MIN(marks) OVER(PARTITION BY branch) AS 'brach_min',
+MAX(marks) OVER(PARTITION BY branch) AS 'brach_max',
+AVG(marks) OVER(PARTITION BY branch) AS 'brach_avg'
+FROM marks;
+
+-- Findng the students in each departments that has above average score
+SELECT *
+FROM (
+SELECT *,
+AVG(marks) 
+OVER(PARTITION BY branch)
+AS 'branch_average'
+FROM marks) t
+WHERE t.marks < t.branch_average
+ORDER BY t.branch;
+;
+
