@@ -330,6 +330,111 @@ GROUP BY genre)
 AS m2
 ON m1.genre = m2.genre;
 
+-- Find the average ratings for each restaurant
+
+SELECT *
+FROM restaurants;
+
+SELECT *
+FROM orders;
 
 
 
+SELECT r_name, 
+ave_ras_rate 
+FROM(
+SELECT 
+r_id, 
+AVG(restaurant_rating)
+AS 'ave_ras_rate'
+FROM orders
+GROUP BY r_id) t2
+JOIN restaurants r 
+ON r.r_id = t2.r_id;
+
+-- Find genres having score > average score of all movies in dataset
+-- Ave score of all
+SELECT AVG(score)
+FROM movies;
+
+SELECT genre,
+AVG(score) 
+AS 'ave_genre_score'
+FROM movies
+GROUP BY genre
+HAVING ave_genre_score >
+(
+SELECT AVG(score) 
+AS 'ave_score'
+FROM movies
+);
+
+
+-- Create a new table 'loyal_customers' for the customers who had ordered at least 3 times or more
+
+SELECT *
+FROM users;
+
+SELECT *
+FROM orders;
+
+CREATE TABLE IF NOT EXISTS loyal_customers
+(user_id INT ,
+name VARCHAR(255),
+money FLOAT
+);
+
+
+INSERT 
+INTO loyal_customers
+(user_id,name) 
+(
+SELECT o.user_id ,u.name
+FROM orders o
+JOIN users u 
+ON o.user_id = u.user_id
+GROUP BY o.user_id ,u.name
+HAVING COUNT(*) > 3);
+
+SELECT * 
+FROM loyal_customers;
+
+-- Q.1. Now provide the 10% app money into the loyal_customers money column basd on their order value.
+-- FInd the total order and total spending
+
+SELECT user_id , 
+SUM(amount) AS total_spendings,
+SUM(amount)/10 AS app_money
+FROM orders 
+GROUP BY user_id ;
+
+UPDATE loyal_customers
+SET money = (
+SELECT SUM(amount) / 10 
+FROM orders
+);
+
+SELECT *
+FROM loyal_customers;
+
+-- Delete all the customers who never ordered
+
+SELECT *
+FROM orders;
+
+SELECT *
+FROM users;
+
+
+
+DELETE FROM users 
+WHERE user_id IN (
+  SELECT user_id FROM (
+    SELECT u.user_id
+    FROM users u
+    LEFT JOIN orders o 
+    ON u.user_id = o.user_id
+    WHERE o.amount 
+    IS NULL
+  ) AS sub
+);

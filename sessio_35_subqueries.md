@@ -570,3 +570,124 @@ GROUP BY genre
 ) AS m2
 ON m1.genre= m2.genre;
 ```
+
+Using the subquery inside the SELECT can be highly inefficient. @1:54:00
+
+### FROM
+
+Q.1. Find the average rating for each restaurant ?
+
+```sql
+SELECT r_name,
+ave_ras_rate
+FROM(
+SELECT
+r_id,
+AVG(restaurant_rating)
+AS 'ave_ras_rate'
+FROM orders
+GROUP BY r_id) t2
+JOIN restaurants r
+ON r.r_id = t2.r_id;
+```
+
+### HAVING
+
+Q.1. Find genres having score > average score of all movies in dataset ? (basically using subquery to filter GROUP BY)
+
+- Find the average of all the movies AVG(score)
+- Compare that to the each genre average score using group by
+
+```sql
+SELECT genre,
+AVG(score) AS 'ave_genre_score'
+FROM movies
+GROUP BY genre
+HAVING ave_genre_score >
+(
+SELECT
+AVG(score)
+AS 'ave_score'
+FROM movies
+);
+```
+
+### INSERT
+
+Q.1. Insert data into the table called 'loyal_customers' for the customers who had ordered at least 3 times or more. Consider the new table 'loyal_customers' is created.
+
+- Do the join between users and oreders
+- Group by the name and id
+- Count
+- Insert into the table
+
+```sql
+SELECT u.name, o.user_id
+FROM orders o
+JOIN users u
+ON o.user_id = u.user_id
+GROUP BY u.name,o.user_id
+HAVING COUNT(*)> 3;
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS loyal_customers
+(
+user_id INT,
+name VARCHAR(255),
+money FLOAT
+);
+```
+
+```sql
+INSERT INTO loyal_customers
+(
+SELECT u.name, o.user_id
+FROM orders o
+JOIN users u
+ON o.user_id = u.user_id
+GROUP BY u.name,o.user_id
+HAVING COUNT(*) > 3;
+);
+```
+
+Here we do not use VALUES keyword while inserting the values as we are inserting from another table.
+
+### UPDATE
+
+Q.1. Now provide the 10% app money into the loyal_customers money column basd on their order value.
+
+```sql
+SELECT user_id ,
+SUM(amount) AS total_spendings,
+SUM(amount)/10 AS app_money
+FROM orders
+GROUP BY user_id ;
+
+UPDATE loyal_customers
+SET money = (
+SELECT SUM(amount) / 10
+FROM orders
+);
+
+SELECT *
+FROM loyal_customers;
+```
+
+### DELETE
+
+Q. Delete all the customers who never ordered.
+
+```sql
+DELETE FROM users
+WHERE user_id IN (
+  SELECT user_id FROM (
+    SELECT u.user_id
+    FROM users u
+    LEFT JOIN orders o
+    ON u.user_id = o.user_id
+    WHERE o.amount
+    IS NULL
+  ) AS sub
+);
+```
