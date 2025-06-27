@@ -177,3 +177,159 @@ FROM movies
 GROUP BY year
 );
 
+-- Find the highest rated movie in each genre where the minimum votes are 25000
+-- Group by Genre
+-- MAX(score) 
+-- Filter votes
+
+SELECT genre , 
+MAX(score)
+FROM movies
+WHERE votes > 25000
+GROUP BY genre;
+
+SELECT *
+FROM movies
+WHERE (genre, score) IN 
+(
+SELECT genre,
+MAX(score)
+FROM movies
+WHERE votes> 25000
+GROUP BY genre
+);
+
+-- Find the top 5 highest grossing movie for star-director combo for gross income
+-- Group by director -star 
+-- MAX(gross)
+-- Use names for the more details of movies
+
+SELECT star,director
+FROM movies
+GROUP BY star,director
+ORDER BY MAX(gross) DESC LIMIT 5;
+
+SELECT *
+FROM movies
+WHERE (star,director) 
+IN 
+(
+SELECT star,director
+FROM movies
+GROUP BY star, director
+ORDER BY MAX(gross)
+DESC LIMIT 5
+);
+
+-- Find all the movies that has the score > AVG(score) of that genre
+-- Average score of genre
+
+SELECT AVG(score),genre
+FROM movies
+GROUP BY genre;
+
+
+
+ SELECT COUNT(*)
+ FROM movies m1
+ WHERE score >
+ (
+ SELECT 
+ AVG(score)
+ FROM movies m2
+ WHERE m2.genre = m1.genre
+ );
+ 
+ SELECT COUNT(*)
+ FROM movies m1
+ JOIN (
+ SELECT genre,
+ AVG(score) AS 'm2_avg_score'
+ FROM movies 
+ GROUP BY genre) AS m2
+ ON m1.genre = m2.genre
+ WHERE m1.score > m2.m2_avg_score;
+ 
+-- Find the favorite food for each customer based on the number of orders repeated by customer
+-- food table, order_details, orders, users
+
+SELECT *
+FROM orders;
+
+SELECT *
+FROM users;
+
+SELECT * 
+FROM order_details;
+
+SELECT *
+FROM delivery_partner;
+
+SELECT *
+FROM food;
+
+WITH fav_food AS(
+SELECT u.user_id,u.name, f.f_name,
+COUNT(*) AS 'food_order_count'
+FROM orders o 
+JOIN users u 
+ON o.user_id = u.user_id
+JOIN order_details od 
+ON o.order_id = od.order_id
+JOIN food f 
+ON od.f_id = f.f_id
+GROUP BY u.name ,f.f_name,u.user_id
+ORDER BY u.name ASC ,
+food_order_count DESC )
+
+SELECT *
+FROM fav_food f1
+WHERE food_order_count =
+(SELECT MAX(food_order_count)
+FROM fav_food f2
+WHERE f2.user_id = f1.user_id
+);
+
+
+-- Get the % of votes for each movie compare to the total number of votes
+-- Get the total votes
+SELECT *
+FROM movies;
+SELECT SUM(votes)
+FROM movies;
+
+SELECT name, 
+(votes / 
+(SELECT 
+SUM(votes)
+FROM movies)) * 100 
+AS '%_of_votes'
+FROM movies;
+
+
+-- Q.2. Display the name of all movies, genre, score and average score
+-- Find the average score of each genre 
+-- Group by genre - find the average
+
+SELECT name,genre, score ,
+(SELECT
+ROUND(AVG(score),2)
+FROM movies m1
+WHERE m1.genre = m2.genre) 
+AS 'genre_ave_score'
+FROM movies m2;
+	
+SELECT m1.name, m1.genre , 
+m1.score,m2.average_genre_score
+FROM movies m1
+JOIN (
+SELECT genre, 
+AVG(score)  AS 'average_genre_score'
+FROM movies
+GROUP BY genre) 
+AS m2
+ON m1.genre = m2.genre;
+
+
+
+

@@ -285,7 +285,7 @@ HAVING AVG(score) > 8.5
 );
 ```
 
-###### Independent Subquery - Table subquery
+### Independent Subquery - Table subquery
 
 Multi Columns X Multi Column (sometimes Single Columns)
 
@@ -311,4 +311,262 @@ MAX(gross - budget)
 FROM movies
 GROUP BY year
 );
+```
+
+Q.2. Find the highest rated movie for each genre where the minimum votes are > 25000
+
+1. Group By genre
+2. MAX(score)
+3. votes > 25000
+4. Use the above results to find the name
+
+```sql
+SELECT genre,
+MAX(score)
+FROM movies
+WHERE votes > 25000
+GROUP BY genre;
+
+SELECT *
+FROM movies
+WHERE (genre,score)
+IN
+(
+SELECT genre,
+MAX(score)
+FROM movies
+WHERE votes > 25000
+GROUP BY genre
+);
+```
+
+Here we can have 3 variation based on the needs
+
+First one is the above -
+
+_First finds the highest-rated movie (by score) for each genre, but only among movies with votes > 25000._
+
+_Then returns all movies (from full table) that match that (genre, score). ⚠️ Caveat: It's possible that the final selected movie has less than 25,000 votes, if another movie with the same genre and score exists but fewer votes._
+
+Second is here
+
+```sql
+SELECT *
+FROM movies
+WHERE (genre, score) IN
+(
+  SELECT genre, MAX(score)
+  FROM movies
+  WHERE votes > 25000
+  GROUP BY genre
+)
+AND votes > 25000;
+```
+
+_Same as Query 1, but also filters final result to only include rows with votes > 25000. ✅ This makes sure both: The best movie per genre is chosen from high-voted movies ,The final result only includes high-voted movies too._
+
+And the last is here
+
+```sql
+SELECT *
+FROM movies
+WHERE (genre, score) IN
+(
+  SELECT genre, MAX(score)
+  FROM movies
+  GROUP BY genre
+)
+AND votes > 25000;
+```
+
+_Finds the highest-rated movie per genre, regardless of votes. Then filters the final results to only include movies with more than 25,000 votes. ❌ This may filter out some top-rated movies per genre if they don't have enough votes — meaning you might miss the actual best one._
+
+Q.3. Find the highest grossing movie of top 5 star-director combo as per the gorss total income
+
+1. Group by star, director
+2. Find their MAX(gross) - LIMIT 5
+3. Use above table for more details
+
+```sql
+SELECT star,director
+FROM movies
+GROUP BY star,director
+ORDER BY MAX(gross) DESC LIMIT 5;
+
+SELECT *
+FROM movies
+WHERE (star,director)
+IN
+(
+SELECT star,director
+FROM movies
+GROUP BY star, director
+ORDER BY MAX(gross)
+DESC LIMIT 5
+);
+```
+
+## Correlated Subquery
+
+Q.1. Find movies that has higher score then the average of that genre it belongs to.
+
+Here it sounds like we can use the GROUP BY to get the average score for each genre, which is not wrong. But we will have result of genre, AVG(score) and then we need to check for each movie with two conditions, one is the genre and another one is its score that has to be > then the average.
+
+```sql
+SELECT genre,
+AVG(score)
+FROM movies
+GROUP BY genre;
+```
+
+This gives the table for each genre and its average score value, which is no use.
+
+So to solve the problem we need to write a query that checks the score of the movie which we are currently checking for its score with respect to its genre with the average score of that genre, you see there is a interconnection for this condition check.
+
+For an example, Lets say we start with first movie - it has score of x, and now we need to see its genre, based on the genre we will check the average score of that genre and if the movie has score higher then the genre then we will print it.
+
+```sql
+SELECT *
+FROM movies m1
+WHERE score >
+(
+SELECT
+AVG(score)
+FROM movies m2
+WHERE m1.genre = m2.genre
+);
+```
+
+Here as we can see the m1 is our current checking movie based on its own score whereas the m2 is the average score of the genre and we compare both of them using genre.
+
+NOW SAME Question can be solve using SELF JOIN and GROUP BY. Here is how
+
+```sql
+SELECT *
+FROM movies m1
+JOIN >
+(SELECT genre,
+AVG(score) AS 'm2_avg_score'
+FROM movies
+GROUP BY genre) AS m2
+ON m1.genre = m2.genre
+WHERE m1.score > m2.m2_avg_score;
+```
+
+Q.2. VERY IMPORTANT TO keep watching 1:28:00 to 1:37:00
+
+We have to find out the favorite food for each person based on what they have ordered most. Using 4 tables and join - users, orders, order_details, food.
+
+```sql
+SELECT *
+FROM users u
+JOIN orders o
+ON u.user_id = o.user_id
+JOIN order_details od
+ON od.order_id = o.order_id
+JOIN food f
+ON od.f_id = f.f_id;
+```
+
+This will give us the grand table for all the details. Now we will GROUP BY based on user_id, user name, food id ,food_name and will count the repetation
+
+```sql
+SELECT u.user_id,u.name, f.f_name,
+COUNT(*) AS 'food_order_count'
+FROM orders o
+JOIN users u
+ON o.user_id = u.user_id
+JOIN order_details od
+ON o.order_id = od.order_id
+JOIN food f
+ON od.f_id = f.f_id
+GROUP BY u.name ,f.f_name,u.user_id
+ORDER BY u.name ASC ,
+food_order_count DESC ;
+```
+
+Since we have the each user_id, name ,food_name and the number of time they order the food, we will use CTE (common table expression).
+
+```sql
+
+WITH fav_food AS(
+SELECT u.user_id,u.name, f.f_name,
+COUNT(*) AS 'food_order_count'
+FROM orders o
+JOIN users u
+ON o.user_id = u.user_id
+JOIN order_details od
+ON o.order_id = od.order_id
+JOIN food f
+ON od.f_id = f.f_id
+GROUP BY u.name ,f.f_name,u.user_id
+ORDER BY u.name ASC ,
+food_order_count DESC )
+
+SELECT *
+FROM fav_food f1
+WHERE food_order_count =
+(SELECT MAX(food_order_count)
+FROM fav_food f2
+WHERE f2.user_id = f1.user_id
+);
+```
+
+## Use based subquery
+
+### SELECT
+
+Q.1. Get the % of votes for each movie as compare to the total votes in the data base
+
+1. Find the total votes
+2. Calculate the %
+
+```sql
+SELECT name,
+votes / (
+SELECT
+SUM(votes)
+FROM movies) * 100
+AS 'percentage_of_votes'
+FROM movies
+```
+
+Q.2. Display the name of all movies, genre, score and average score
+
+In this case it will be easy to get the name, score and genre of reach movie.
+
+We can solve this using subquery or join as well
+
+1. Using Subquery
+
+```sql
+SELECT name,genre,score
+FROM movies;
+```
+
+But we need another column that gives the average score for each column
+
+```sql
+SELECT name, genre,score,
+(SELECT
+AVG(score)
+FROM movies m1
+WHERE m1.genre = m2.genre
+)
+FROM movies m2;
+```
+
+2. Now same problem can be solve using join
+
+```sql
+SELECT m1.name,m1.genre,m1.score,
+m2.ave_genre_score
+FROM movies m1
+JOIN (
+SELECT genre,
+AVG(score) AS 'ave_genre_score'
+FROM movies
+GROUP BY genre
+) AS m2
+ON m1.genre= m2.genre;
 ```
