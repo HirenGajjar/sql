@@ -658,16 +658,11 @@ Here we do not use VALUES keyword while inserting the values as we are inserting
 Q.1. Now provide the 10% app money into the loyal_customers money column basd on their order value.
 
 ```sql
-SELECT user_id ,
-SUM(amount) AS total_spendings,
-SUM(amount)/10 AS app_money
-FROM orders
-GROUP BY user_id ;
-
 UPDATE loyal_customers
 SET money = (
-SELECT SUM(amount) / 10
+SELECT SUM(amount) * 0.1
 FROM orders
+WHERE orders.user_id = loyal_customers.user_id
 );
 
 SELECT *

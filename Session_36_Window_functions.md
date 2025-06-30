@@ -1,5 +1,17 @@
 # Window Functions
 
+| Concept               | `GROUP BY`                                                    | `OVER()`(Window Functions)                                  |
+| --------------------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
+| **Purpose**           | Aggregates data into**one row per group and collapsing them** | Performs calculations**across rows**without collapsing them |
+| **Output Rows**       | **Reduces**number of rows                                     | **Keeps**all original rows                                  |
+| **Use Case**          | Summarize data                                                | Compare rows, rank, compute moving averages, etc.           |
+| **Example Functions** | `SUM()`,`AVG()`,`COUNT()`                                     | `SUM() OVER()`,`ROW_NUMBER() OVER()`,`RANK()`               |
+
+| SQL Concept | Analogy                                                        |
+| ----------- | -------------------------------------------------------------- |
+| `GROUP BY`  | Grouping people by city and reporting 1 stat per city          |
+| `OVER()`    | Giving each person a city-average value while keeping everyone |
+
 Lets say we have a table called 'students' - that has id, name, department, and score. We have 10 students and each has id, name, department and score. There are mainly 2 departments - IT and CS. Our goal is to find the average score of students in each department. To achieve that we use GROUP BY.
 
 ```sql
@@ -86,3 +98,121 @@ FROM marks;
 ```
 
 ## RANK()
+
+Rank give the ranking based on column
+
+Q.1 Give the ranking to students as whole dataset not as per the branch
+
+```sql
+SELECT *,
+RANK() OVER(ORDER BY marks DESC)
+FROM marks;
+```
+
+Here intresting to note for the rank function is that if there are two rows or more who gets the same ranking then it will give them a same ranks for an example if there are 3 students who have 98 marks then all of them will get the same rank (for an example their rank is 2 2 2), and then the next row will not get the rank 3 but 5.
+
+Q.2. Rank the students based on marks in each branch.
+
+```sql
+SELECT *,
+RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+FROM marks;
+```
+
+Q.3. Now lets rank each stundent for overall_rank and branch_rank as well
+
+```sql
+SELECT *,
+RANK()
+OVER(ORDER BY marks DESC)
+AS 'overall_rank',
+RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_rank'
+FROM marks;
+```
+
+## DENSE_RANK()
+
+As we discussed above that the rank will give the same rank as per the condition and the next rank will be jumped by the total number of same ranks previously given, so for an example if there are three people with 100 marks gets the same rank of 6, then the next person will not get rank 2, instead the rank of next person is 9.
+
+Here DENSE_RANK() instead of giving the fourth person rank of 9 it will give the rank 7.
+
+![1751310903849](image/Session_36_Window_functions/1751310903849.png)
+
+Q.1. Give dense_rank for each student on whole dataset
+Q.2. Give dense rank for each stundet based on branch
+Q.3. Give dense rank for both of the above
+
+```sql
+SELECT *,
+DENSE_RANK()
+OVER(ORDER BY marks DESC)
+AS 'overall_dense_rank'
+FROM marks;
+```
+
+```sql
+SELECT *,
+DENSE_RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_dense_rank'
+FROM marks;
+```
+
+```sql
+SELECT *,
+DENSE_RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_dense_rank',
+DENSE_RANK()
+OVER(ORDER BY marks DESC)
+AS 'overall_dense_rank'
+FROM marks;
+```
+
+## ROW_NUMBER()
+
+it just assign the row number
+
+Q.1. Add new row as a row_num for overall data
+
+```sql
+SELECT *,
+ROW_NUMBER()
+OVER()
+AS 'overall_row_number'
+FROM marks;
+```
+
+Q.2. Add new row_number for each branch
+
+```sql
+SELECT *,
+ROW_NUMBER()
+OVER(PARTITION BY branch)
+AS 'branch_row_number'
+FROM marks;
+```
+
+Q.3 Create a new column that is made up of department + overall row number of data set and call it unique_student_id
+
+```sql
+SELECT *,
+ROW_NUMBER()
+OVER()
+AS 'overall_row_number',
+CONCAT(department,'_',ROW_NUMBER() OVER() )
+AS 'unique_student_id'
+FROM marks;
+```
+
+Q.4. Make a unique student email address that has 'name.department@mail.com',
+
+```sql
+SELECT *,
+CONCAT(name,'.',branch,'@mail.com')
+AS 'email'
+FROM marks;
+```

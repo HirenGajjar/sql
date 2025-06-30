@@ -1,0 +1,293 @@
+USE s_35_practice;
+
+CREATE TABLE marks (
+ student_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255),
+    branch VARCHAR(255),
+    marks INTEGER
+);
+
+INSERT INTO marks (name,branch,marks)VALUES 
+('Nitish','EEE',82),
+('Rishabh','EEE',91),
+('Anukant','EEE',69),
+('Rupesh','EEE',55),
+('Shubham','CSE',78),
+('Ved','CSE',43),
+('Deepak','CSE',98),
+('Arpan','CSE',95),
+('Vinay','ECE',95),
+('Ankit','ECE',88),
+('Anand','ECE',81),
+('Rohit','ECE',95),
+('Prashant','MECH',75),
+('Amit','MECH',69),
+('Sunny','MECH',39),
+('Gautam','MECH',51);
+
+SELECT *
+FROM marks;
+
+SELECT *,
+AVG(marks) 
+OVER() 
+AS "Overall Average"
+FROM marks;
+
+SELECT branch,
+AVG(marks)
+FROM marks
+GROUP BY branch;
+
+
+SELECT * , 
+AVG(marks)
+OVER(PARTITION BY branch) 
+AS 'branch_average'
+FROM marks;
+
+-- Find the average marks for each branch.
+
+SELECT AVG(marks)
+FROM marks
+GROUP BY branch;
+
+SELECT *, 
+AVG(marks)
+OVER(PARTITION BY branch)
+FROM marks;
+
+-- Count the number of students in each branch.
+
+SELECT branch,COUNT(*) 
+FROM marks
+GROUP BY branch;
+
+SELECT *,
+COUNT(*) 
+OVER(PARTITION BY branch)
+FROM marks;
+
+-- Get the maximum and minimum marks in each branch.
+
+SELECT *,
+MAX(marks) 
+OVER(PARTITION BY branch) 
+AS 'highest_marks',
+MIN(marks)
+OVER(PARTITION BY branch)
+AS 'lowest_marks'
+FROM marks;
+
+SELECT branch,
+MAX(marks) 
+AS 'highest_marks',
+MIN(marks)
+AS 'lowest_marks'
+FROM marks
+GROUP BY branch;
+
+-- List all branches along with their total marks.
+
+SELECT branch,
+SUM(marks)
+FROM marks
+GROUP BY branch;
+
+SELECT *,
+SUM(marks) 
+OVER(PARTITION BY branch)
+FROM marks
+ORDER BY branch;
+
+-- 5. Find the number of students who scored more than 80 in each branch.
+
+SELECT DISTINCT(branch),
+COUNT(*)
+OVER(PARTITION BY branch)
+FROM marks
+WHERE marks > 80;
+
+SELECT branch,
+COUNT(*)
+FROM marks
+WHERE marks> 80
+GROUP BY branch;
+
+
+-- Show each student’s marks and the average marks of their branch using a window function.
+
+SELECT *,
+AVG(marks)
+OVER(PARTITION BY branch)
+FROM marks;
+
+-- Show each student’s marks along with the highest and lowest marks in their branch using OVER().
+
+SELECT *,
+MIN(marks) 
+OVER(PARTITION BY branch) 
+AS 'min',
+MAX(marks) 
+OVER(PARTITION BY branch) 
+AS 'max'
+FROM marks;
+
+
+
+-- Show total marks per branch next to each student without reducing rows.
+
+SELECT *,
+SUM(marks) 
+OVER(PARTITION BY branch)
+AS 'total_branch_marks'
+FROM marks;
+
+
+-- Find the top 2 students per branch using window functions.
+
+SELECT *,
+MAX(marks) 
+OVER(PARTITION BY branch)
+AS 'branch_max'
+FROM marks;
+
+SELECT *,
+MIN(marks)
+OVER()
+AS 'overall_min',
+MAX(marks)
+OVER()
+AS 'overall_max',
+MIN(marks) 
+OVER(PARTITION BY branch)
+AS 'branch_min_marks',
+MAX(marks)
+OVER(PARTITION BY branch)
+AS 'branch_max_marks'
+FROM marks;
+
+-- Find all the students in each branch having marks > avg of branch
+SELECT *
+FROM (
+SELECT *,
+AVG(marks) 
+OVER(PARTITION BY branch)
+AS 'branch_avg'
+FROM marks) t
+WHERE t.marks > t.branch_avg;
+
+-- Rank the student in each branch based on the marks
+
+SELECT *,
+RANK() 
+OVER(PARTITION BY branch ORDER BY marks DESC) 
+FROM marks;
+
+SELECT *,
+RANK()
+OVER(ORDER BY marks DESC)
+FROM marks;
+
+SELECT *,
+RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+FROM marks;
+
+-- Now Rank students based on marks - one for their branch , two for overall 
+
+SELECT *,
+RANK()
+OVER(ORDER BY marks DESC) 
+AS 'overall_rank',
+RANK()
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_rank'
+FROM marks;
+
+-- 1. Give dense_rank for each student on whole dataset
+-- 2. give dense rank for each stundet based on branch
+-- 3. give dense rank for both of the above
+
+SELECT *,
+DENSE_RANK() 
+OVER(ORDER BY marks) 
+AS 'overall_dense_rank'
+FROM marks;
+
+SELECT *,
+DENSE_RANK()
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'branch_dense_rank'
+FROM marks;
+
+SELECT *,
+DENSE_RANK()
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'branch_dense_rank',
+DENSE_RANK()
+OVER(ORDER BY marks)
+AS 'branch_dense_rank'
+FROM marks;
+
+SELECT *,
+ROW_NUMBER()
+OVER() 
+AS 'row_number'
+FROM marks;
+
+SELECT *,
+ROW_NUMBER()
+OVER(PARTITION BY branch)
+AS 'branch_row_number'
+FROM marks;
+
+SELECT *,
+ROW_NUMBER()
+OVER(PARTITION BY branch) 
+AS 'branch_row_number',
+ROW_NUMBER()
+OVER()
+AS 'overall_row_number'
+FROM marks;
+
+-- Make a student_unique_code that is barnch name + overall row number
+
+SELECT *,
+ROW_NUMBER()
+OVER() 
+AS 'overall_row_number',
+CONCAT(branch,'_',ROW_NUMBER() OVER() )
+FROM marks;
+
+-- Make each student unique email that is 'studentid.name.branch' 
+
+SELECT *,
+CONCAT(name,'.',branch,'@mail.com')
+AS 'student_email'
+FROM marks;
+
+SELECT *,
+CONCAT(name,'.',branch,'@mail.com') 
+AS 'email'
+FROM marks;
+
+-- Find the top 2 most paying cutomers for each month
+
+SELECT *
+FROM orders
+ORDER BY date;
+
+SELECT 
+SUBSTRING(date,5,3) AS 'month'
+FROM orders;
+
+SELECT user_id,
+MONTHNAME(date),
+SUM(amount) 
+AS 'total_spending'
+FROM orders
+GROUP BY user_id, 
+MONTHNAME(date)
+ORDER BY 
+MONTHNAME(date) ASC;
