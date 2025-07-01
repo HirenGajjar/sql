@@ -633,8 +633,22 @@ AS 'previous_student_marks'
 FROM marks;
 ```
 
-![1751345457287](image/Session_36_Window_functions/1751345457287.png)![1751345457287](image/Session_36_Window_functions/1751345457287.png)
+![1751345457287](image/Session_36_Window_functions/1751345457287.png)
 
 Like this we get new column with name and the marks of the previous row, and for the first row there is NULL as there is no 0th ROW.
 
 ## LEAD()
+
+LEAD() is another intresting methodthat gives the output of the value we provide in method and based on the order we give in OVER().
+
+For an example if we say LEAD(marks) OVER(ORDER BY student_id ) then it will give us the new column that will carry the marks of the next rows student and for the last person the marks will be NULL as there is no next ROW.
+
+```sql
+SELECT *,
+LEAD(marks)
+OVER(ORDER BY student_id)
+AS 'next_student_marks'
+FROM marks;
+```
+
+![1751349585339](image/Session_36_Window_functions/1751349585339.png)
