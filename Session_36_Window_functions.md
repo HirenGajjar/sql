@@ -365,4 +365,43 @@ LAST_VALUE(expression , IGNORE/RESPECT)
 - RESPECT - keeps the last value EVEN IF IT IS A NULL
 - Default is RESPECT
 
+LETS DO AN EXAMPLE TO UNDERSTAND IN DEPTH.
+
+Q. Find the marks of the studnet that has least score in each brach.
+
+WRONG SOLUTION
+
+```sql
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+) AS 'last_in_branch'
+FROM marks;
+```
+
+![1751337045017](image/Session_36_Window_functions/1751337045017.png)
+
+Now this is not what we want, and here is why we got this result. First we said we need last_value(), secondly we said we are using partition by branch and third we said we want to order the score from lowest to highest.
+
+IMPORTANT TO note here is the default range of the OVER() is RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW - that means from the first row to current row NOT THE LAST row. It is very importatn to understand here that is it till the current row.
+
+that means every time when we will check for the last value on first row and our data is sorted from smallest to highest it will give us the lowest value for first iteration, but then the current value will be the second row and since we said we need last value it will give us the second values based on order by list , for third again the current value will be the third on the order by as the frame or range expands untill the last value. So to overcome the problem what we need to do is to fix the range with the lowest value to come last - hence DESC order. (need to think here why DESC is important too but will make sense.)
+
+And when we do those two changes - DESC and RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING we get the expected result.
+
+```sql
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+)
+FROM marks;
+```
+
+![1751337569897](image/Session_36_Window_functions/1751337569897.png)
+
+Here is what we wanted - the lowest in each branch - now to get the name we simply need to change LAST_VALUE(name).
+
 ## NTH_VALUE()
