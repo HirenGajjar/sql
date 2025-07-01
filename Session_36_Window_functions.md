@@ -322,6 +322,22 @@ So let say in first branch of CSE - we order the marks in the DESC order means h
 
 Importatnly , the RANGE BETWEEN UNBOUNCDED PRECEDING AND CURRENT ROW is the defaul value in OVER() that means our frame will be from the first row to current row and since we shorted the data in DESC, and used first value it will give the first values for each branch.
 
+### Common FRAMES
+
+to keep in mind - althought we can create as we need.
+
+| **Frame Clause**                                            | **Type** | **Meaning in Simple Words**                                                      |
+| ----------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`          | `ROWS`   | From the first row to the current row (used for running totals / cumulative sum) |
+| `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING`  | `ROWS`   | The**entire partition**— from first to last row                                  |
+| `ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING`          | `ROWS`   | From the current row to the last row                                             |
+| `ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING`                  | `ROWS`   | The row before, the current row, and the row after (3-row sliding window)        |
+| `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`                  | `ROWS`   | The 2 rows before the current one, and the current one                           |
+| `ROWS BETWEEN CURRENT ROW AND CURRENT ROW`                  | `ROWS`   | Only the current row                                                             |
+| `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`         | `RANGE`  | All rows with ordering values ≤ current row’s value                              |
+| `RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` | `RANGE`  | All rows in the partition regardless of order values (full partition)            |
+| `RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING`         | `RANGE`  | All rows with ordering values ≥ current row’s value                              |
+
 ## FIRST_VALUE
 
 **_Returns the first value within an ordered group of values._**
@@ -405,3 +421,49 @@ FROM marks;
 Here is what we wanted - the lowest in each branch - now to get the name we simply need to change LAST_VALUE(name).
 
 ## NTH_VALUE()
+
+NTH_VALUE(col_name, the value we need)
+
+In below question we need the marks of the second highest student so we will give col_name as marks and 2 as the value
+
+Q. Find the number 2 as per the score in each branch
+
+```sql
+SELECT *,
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_in_branch'
+FROM marks;
+```
+
+Now that each branch only has 4 recods in our dataset if we try to get the 5th or anything above 4 it will give us NULL.
+
+```sql
+SELECT *,
+NTH_VALUE(marks,6)
+OVER(PARTITION BY branch
+ORDER BY marks
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+FROM marks;
+```
+
+Q. Find the mark of the student in each branch that has second highest score, and second lowest score
+
+```sql
+SELECT *,
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_highest',
+NTH_VALUE(marks, 2)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_lowest'
+FROM marks
+ORDER BY branch,
+marks DESC;
+```

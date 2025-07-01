@@ -348,3 +348,108 @@ OVER(PARTITION BY branch ORDER BY marks DESC)
 AS 'new_unknow_row'
 FROM marks
 ORDER BY branch, marks ASC;
+
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+) AS 'last_in_branch'
+FROM marks;
+
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+) AS 'last_in_branch'
+FROM marks;
+
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+)
+FROM marks;
+
+
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+) AS 'last_in_branch'
+FROM marks
+ORDER BY branch ,
+marks DESC;
+
+-- Find the student name and his marks in overall database who has the lowest marks
+
+SELECT *,
+LAST_VALUE(name)
+OVER(ORDER BY marks DESC 
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS 'name_of_last_of_all',
+LAST_VALUE(marks)
+OVER(ORDER BY marks DESC 
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'mark_of_last_of_all'
+FROM marks;
+
+-- Now find the last in each branch , give name and score
+
+SELECT *,
+LAST_VALUE(name)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'name_of_last_in_branch',
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'marks_of_last_in_branch'
+FROM marks ;
+
+-- Now partition by the branch , order by the marks from low to high and make a new row that adds the score of each studnent based on the order 
+
+SELECT *,
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+FROM marks
+ORDER BY branch, marks DESC;
+
+SELECT *,
+NTH_VALUE(marks,6)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN
+UNBOUNDED PRECEDING 
+AND 
+UNBOUNDED FOLLOWING)
+FROM marks;
+
+SELECT *,
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+FROM marks
+ORDER BY branch, marks ASC;
+
+SELECT *,
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_from_top',
+NTH_VALUE(marks, 2)
+OVER(PARTITION BY branch
+ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_lowest'
+FROM marks
+ORDER BY branch , marks DESC;
+
