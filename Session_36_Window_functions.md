@@ -1,5 +1,7 @@
 # Window Functions
 
+Window functions in sql are the functions that allows to perform calculations across a specific set of rows releted to the current row.
+
 | Concept               | `GROUP BY`                                                    | `OVER()`(Window Functions)                                  |
 | --------------------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
 | **Purpose**           | Aggregates data into**one row per group and collapsing them** | Performs calculations**across rows**without collapsing them |
@@ -216,3 +218,151 @@ CONCAT(name,'.',branch,'@mail.com')
 AS 'email'
 FROM marks;
 ```
+
+## QUESTION
+
+Q. Find the top 2 customers from orders table who have spend the most for each month.
+
+There are many things to learn here, first extracting the month. This can be done with few methods.
+
+```sql
+SELECT
+MONTHNAME(date)
+FROM orders;
+
+-- OR
+
+SELECT
+MONTH(date)
+FROM orders;
+
+-- OR
+
+SELECT
+SUBSTRING(date,5,3)
+FROM orders;
+```
+
+Once we have the month - we will do group by month, and user_id then find the sum for each user
+
+```sql
+SELECT user_id,
+MONTH(date) AS 'month',
+SUM(amount) AS 'total'
+FROM orders
+GROUP BY user_id,
+MONTH(date);
+```
+
+Now we will give the rank to each row partitioning with month and order it by spendings
+
+```sql
+SELECT user_id,
+MONTH(date) AS 'month',
+SUM(amount) AS 'total',
+RANK()
+OVER(PARTITION BY MONTH(date) ORDER BY SUM(amount) )
+AS 'month_rank'
+FROM orders
+GROUP BY user_id , MONTH(date);
+```
+
+Now we will use the same output as a subquery to give the condition of top 2
+
+```sql
+SELECT *
+FROM (
+SELECT user_id,
+MONTH(date) AS 'month',
+SUM(amount) AS 'total',
+RANK()
+OVER(PARTITION BY MONTH(date) ORDER BY SUM(amount) )
+AS 'month_rank'
+FROM orders
+GROUP BY user_id ,MONTH(date)
+) t
+WHERE t.month_rank < 3;
+```
+
+## PERCENT_RANK()
+
+Q. Find th percentage for each student in each branch
+
+```sql
+SELECT *,
+PERCENT_RANK()
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'branch_percentage'
+FROM marks
+ORDER BY branch,
+marks DESC;
+```
+
+## FRAME
+
+When we use the PARTITION BY with ORDER BY it basically creates the frame of rows that will used to retrive the results. Now the result will depend on few things. One what are we partitioning ? Two what is the order ? Third what is the function in use ? Fourth is what is the condition of the RANGE BETWEEN.
+
+Lets take the following example of FIRST_VALUE()
+
+```sql
+SELECT *,
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks DESC)
+FROM marks;
+```
+
+Here we are considering the first value from marks.
+
+PARTITION BY branch , and the marks in each branch is sorted from hightest to lowest.
+
+Now important thing to keep in mind is that we are using FIRST_VALUE() - that means from our partition , order and RANGE BETWEEN we will retrive the first value.
+
+So let say in first branch of CSE - we order the marks in the DESC order means highest marks will be the first row and because we used the first value - for each branch that will be the retrived result.
+
+Importatnly , the RANGE BETWEEN UNBOUNCDED PRECEDING AND CURRENT ROW is the defaul value in OVER() that means our frame will be from the first row to current row and since we shorted the data in DESC, and used first value it will give the first values for each branch.
+
+## FIRST_VALUE
+
+**_Returns the first value within an ordered group of values._**
+
+FIRST_VALUE(expression , IGNORE/RESPECT)
+
+- Expression means the row or the condition
+- IGONRE - _ignores_ the first value IF IT IS A NULL
+- RESPECT - _keeps_ the first value EVEN IF IT IS A NULL
+- The default value is RESPECT
+
+Lets say from the marks table , we want to find the name of a student who has the highest marks amongs the all - we will use FIRST_VALUE() and since we need the name of that student we have to pass that column name in FIRST_VALUE(name) and with that we will use OVER(PARTITION BY marks DESC)
+
+```sql
+SELECT *,
+FIRST_VALUE(name)
+OVER(ORDER BY marks DESC)
+AS 'topper_name'
+FROM marks;
+```
+
+Now to find the overall topper of the class we need to add LIMIT 1
+
+```sql
+SELECT *,
+FIRST_VALUE(name)
+OVER(ORDER BY marks DESC)
+AS 'overall_topper'
+FROM marks
+LIMIT 1;
+```
+
+## LAST_VALUE()
+
+**_Returns the last value within an ordered group of values._**
+
+LAST_VALUE(expression , IGNORE/RESPECT)
+
+- Column / Expression that basically determines the return value
+- IGNORE - ignores the last value IF IT IS A NULL
+- RESPECT - keeps the last value EVEN IF IT IS A NULL
+- Default is RESPECT
+
+## NTH_VALUE()

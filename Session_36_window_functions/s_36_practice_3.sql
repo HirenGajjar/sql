@@ -282,12 +282,69 @@ SELECT
 SUBSTRING(date,5,3) AS 'month'
 FROM orders;
 
-SELECT user_id,
-MONTHNAME(date),
-SUM(amount) 
-AS 'total_spending'
-FROM orders
-GROUP BY user_id, 
+SELECT 
+MONTH(date),
 MONTHNAME(date)
-ORDER BY 
-MONTHNAME(date) ASC;
+FROM orders;
+
+SELECT *
+FROM
+(SELECT user_id,
+MONTH(date) AS 'mm',
+SUM(amount) AS 'spending',
+RANK()
+OVER(PARTITION BY MONTH(date) ORDER BY SUM(AMOUNT) DESC) 
+AS 'rank'
+FROM orders
+GROUP BY user_id ,MONTH(date)) t1
+WHERE t1.rank <= 2;
+
+SELECT *
+FROM (
+SELECT user_id,
+MONTH(date) AS 'month',
+SUM(amount) AS 'total',
+RANK()
+OVER(PARTITION BY MONTH(date)
+ORDER BY SUM(AMOUNT) ) AS 'month_rank'
+FROM orders
+GROUP BY user_id , MONTH(date)) t
+WHERE t.month_rank < 3;
+
+SELECT *
+FROM marks;
+
+SELECT *,
+FIRST_VALUE(name)
+OVER(ORDER BY marks DESC ) 
+AS 'topper_name'
+FROM marks; 
+
+-- Find the overall data topper
+
+SELECT *,
+FIRST_VALUE(name)
+OVER(ORDER BY marks DESC) 
+AS 'topper_name'
+FROM marks
+LIMIT 1;
+
+SELECT *,
+PERCENT_RANK()
+OVER(PARTITION BY branch ORDER BY marks ASC) * 100
+FROM marks
+ORDER BY branch , marks DESC;
+
+SELECT *,
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC) 
+AS 'highest_marks_for_each_branch'
+FROM marks;
+
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'new_unknow_row'
+FROM marks
+ORDER BY branch, marks ASC;
