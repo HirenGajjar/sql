@@ -467,3 +467,80 @@ FROM marks
 ORDER BY branch,
 marks DESC;
 ```
+
+## EXAMPLE
+
+-- Write a mega query that gives the following columns
+-- marks , name topper of whole data
+-- marks , name of last in whole data
+-- 2nd highest name, marks in whole data
+-- 2nd lowest name, marks in whole data
+-- marks , name topper of each branch
+-- marks , name of last in eahc branch
+-- 2nd highest name, marks in each branch
+-- 2nd lowest name, marks in each branch
+
+```sql
+SELECT *,
+FIRST_VALUE(marks)
+OVER(ORDER BY marks DESC)
+AS 'topper_marks_overall',
+FIRST_VALUE(name)
+OVER(ORDER BY marks DESC)
+AS 'topper_name_overall',
+NTH_VALUE(marks,2)
+OVER(ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_from_top_marks_overall',
+NTH_VALUE(name,2)
+OVER(ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_topper_name_overall',
+LAST_VALUE(marks)
+OVER(ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'overall_last_marks',
+LAST_VALUE(name)
+OVER(ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'overall_last_name',
+NTH_VALUE(marks,2)
+OVER(ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_last_overall_marks',
+NTH_VALUE(name,2)
+OVER(ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_last_overall_name',
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_topper_marks',
+FIRST_VALUE(name)
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'branch_topper_name',
+LAST_VALUE(marks)
+OVER(PARTITION BY branch ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS 'last_in_branch_marks',
+LAST_VALUE(name)
+OVER(PARTITION BY branch ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'last_in_branch_name',
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS '2nd_top_in_branch_marks',
+NTH_VALUE(name,2)
+OVER(PARTITION BY branch ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS '2nd_top_in_branch_name',
+NTH_VALUE(marks,2)
+OVER(PARTITION BY branch ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_last_in_branch_marks',
+NTH_VALUE(name,2)
+OVER(PARTITION BY branch ORDER BY marks ASC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS '2nd_;lowest_in_branch_name'
+FROM marks;
+```
