@@ -544,3 +544,97 @@ RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 AS '2nd_;lowest_in_branch_name'
 FROM marks;
 ```
+
+Q.2 Find the name, branch and marks of the topper from each branch
+
+```sql
+SELECT name,branch,marks
+FROM (
+SELECT *,
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks DESC)
+AS 'topper_marks',
+FIRST_VALUE(name)
+OVER(PARTITION BY branch
+ORDER BY marks DESC)
+AS 'topper_name'
+FROM marks) t
+WHERE t.name = t.topper_name
+AND t.marks = t.topper_marks;
+```
+
+Q.3 Find the name, branch and marks of the last in each branch
+
+```sql
+SELECT name,branch,marks
+FROM (
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS 'last_marks',
+LAST_VALUE(name)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'last_name'
+FROM marks) t
+WHERE t.name = t.last_name
+AND t.marks = t.last_marks;
+```
+
+## WINDOW
+
+We can use the window keyword for the repetative code and it comes after the FROM marks generally. AT THE LAST
+
+Let say we want to get the name and marks of the branch topper with optimizing the code.
+
+Here is what we have done so far
+
+```sql
+SELECT *,
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'topper_marks',
+FIRST_VALUE(name)
+OVER(PARTITION BY branch ORDER BY marks DESC)
+AS 'topper_name'
+FROM marks;
+```
+
+Here the code OVER(PARTITION BY branch ORDER BY marks DESC) is basically common repetated code that we can optimize using window AS syntax. Here is how
+
+```sql
+SELECT *,
+FIRST_VALUE(marks)
+OVER top_data
+AS 'topper_marks',
+FIRST_VALUE(name)
+OVER top_data
+AS 'topper_name'
+FROM marks
+WINDOW  top_data
+AS (PARTITION BY branch ORDER BY marks DESC);
+```
+
+## LAG()
+
+It is quiet intresting method. Let say we want to get the marks of the previous student based on student_id and consider the data is sorted by student_id
+
+So the first row will be the information of student_id 1 and the next column will be created and that will have NULL value because there is no 0th ROW. For the second row the new column will have value as a marks of the first (previous) row.
+
+```sql
+SELECT *,
+LAG(marks)
+OVER(ORDER BY student_id ASC)
+AS 'previous_student_marks'
+FROM marks;
+```
+
+![1751345457287](image/Session_36_Window_functions/1751345457287.png)![1751345457287](image/Session_36_Window_functions/1751345457287.png)
+
+Like this we get new column with name and the marks of the previous row, and for the first row there is NULL as there is no 0th ROW.
+
+## LEAD()

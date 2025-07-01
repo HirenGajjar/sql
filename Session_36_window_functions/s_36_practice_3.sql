@@ -527,4 +527,58 @@ RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 AS '2nd_;lowest_in_branch_name'
 FROM marks;
 
+SELECT name,branch,marks
+FROM (
+SELECT *,
+FIRST_VALUE(marks)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC) 
+AS 'topper_marks',
+FIRST_VALUE(name)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC)
+AS 'topper_name'
+FROM marks) t 
+WHERE t.name = t.topper_name 
+AND t.marks = t.topper_marks;
+
+SELECT name,branch,marks
+FROM (
+SELECT *,
+LAST_VALUE(marks)
+OVER(PARTITION BY branch 
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
+AS 'last_marks',
+LAST_VALUE(name)
+OVER(PARTITION BY branch
+ORDER BY marks DESC
+RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+AS 'last_name'
+FROM marks) t
+WHERE t.name = t.last_name 
+AND t.marks = t.last_marks;
+
+SELECT *,
+FIRST_VALUE(marks)
+OVER top_data
+AS 'tooper_marks',
+FIRST_VALUE(name)
+OVER top_data
+AS 'topper_name'
+FROM marks
+WINDOW top_data 
+AS (PARTITION BY branch ORDER BY marks DESC) ;
+
+SELECT *,
+FIRST_VALUE(marks)
+OVER top_data
+AS 'topper_marks',
+FIRST_VALUE(name)
+OVER top_data
+AS 'topper_name'
+FROM marks
+WINDOW  top_data 
+AS (PARTITION BY branch ORDER BY marks DESC);
+
 
