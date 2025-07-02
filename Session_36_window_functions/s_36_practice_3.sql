@@ -582,3 +582,72 @@ WINDOW  top_data
 AS (PARTITION BY branch ORDER BY marks DESC);
 
 
+SELECT *,
+LAG(marks)
+OVER(ORDER BY student_id)
+AS 'previous_student_marks'
+FROM marks;
+
+SELECT *,
+LEAD(marks)
+OVER(ORDER BY student_id)
+AS 'marks_of_next'
+FROM marks;
+
+SELECT *,
+LEAD(marks)
+OVER(ORDER BY student_id)
+AS 'next_student_marks'
+FROM marks;
+
+SELECT *,
+LEAD(marks)
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'lead_branch_marks',
+LAG(marks)
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'lag_branch_marks'
+FROM marks;
+
+SELECT *
+FROM orders;
+
+SELECT 
+MONTHNAME(date) 
+AS mm,
+SUM(amount)
+AS eanrings,
+LEAD(SUM(amount))
+OVER(ORDER  BY MONTHNAME(date) )
+AS 'last_month',
+((SUM(amount) - (LEAD(SUM(amount)) OVER(ORDER BY MONTHNAME(date)))) / (LEAD(SUM(amount)) OVER(ORDER BY MONTHNAME(date))) ) * 100 AS '%'
+FROM orders
+GROUP BY MONTHNAME(date) 
+ORDER BY mm DESC;
+
+SELECT 
+SUM(amount),
+MONTHNAME(date)
+FROM orders
+GROUP BY MONTHNAME(date);
+
+SELECT 
+SUM(amount),
+MONTH(date),
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date))
+AS 'last_month_earnings',
+((SUM(amount) - 
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date)) ) /
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date)) )
+* 100
+AS '%'
+FROM orders
+GROUP BY MONTH(date);
+
+
+
+
+

@@ -652,3 +652,50 @@ FROM marks;
 ```
 
 ![1751349585339](image/Session_36_Window_functions/1751349585339.png)
+
+Q. Do lead and lag for each branch marks
+
+```sql
+SELECT *,
+LEAD(marks)
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'lead_branch_marks',
+LAG(marks)
+OVER(PARTITION BY branch ORDER BY marks)
+AS 'lag_branch_marks'
+FROM marks;
+```
+
+## Question
+
+Q. Find the MoM % change in orders table
+
+Step 1 - get the group by month and sum of earnings
+
+```sql
+SELECT
+SUM(amount),
+MONTHNAME(date)
+FROM orders
+GROUP BY MONTHNAME(date);
+```
+
+Step 2 get the value of last months earning for each row
+
+```sql
+SELECT
+SUM(amount),
+MONTH(date),
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date))
+AS 'last_month_earnings',
+((SUM(amount) -
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date)) ) /
+LAG(SUM(amount))
+OVER(ORDER BY MONTH(date)) )
+* 100
+AS '%'
+FROM orders
+GROUP BY MONTH(date);
+```
