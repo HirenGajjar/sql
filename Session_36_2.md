@@ -139,3 +139,54 @@ IN (50,100,150,200);
 And that is it. Now we have a table that gives us the run till match 50,100,150, and 200.
 
 ## Cumulative AVERAGE
+
+Q. Find the average of virat kohli after match number 50,100,150,200.
+
+```sql
+SELECT match_number ,
+average_till_that_match
+FROM (
+SELECT 
+SUM(batsman_run) AS 'that_match_run',
+ROW_NUMBER()
+OVER(ORDER BY ID) AS 'match_number',
+SUM(SUM(batsman_run))
+OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+AS 'runs_till_that_match',
+ROUND(AVG(SUM(batsman_run))
+OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW),2)
+AS 'average_till_that_match'
+FROM ipl
+WHERE batter ='V Kohli'
+GROUP BY ID)t 
+WHERE t.match_number 
+IN (50,100,150,200);
+```
+
+## Running / Moving AVERAGE
+
+It helps getting current trands and patterns in data.
+
+For running average we have to decide the window period let say 5. That is mean we want to find the average of 5 matches window or sum of runs by batter in 5 matches period at perticular given point. In other words, let say we decided to get the average of virat kohli for 5 (window period) matches starting from match number 20. So we will get the data of match number 20,19,18,17,16. 
+
+Q. Find the V Kohli's average for 10 matches patch.
+
+```sql
+SELECT 
+ROW_NUMBER()
+OVER(ORDER BY ID)
+AS 'match_number',
+SUM(batsman_run) 
+AS 'runs_in_that_match',
+SUM(SUM(batsman_run))
+OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) 
+AS 'runs_till_that_match',
+AVG(SUM(batsman_run))
+OVER(ROWS BETWEEN 9 PRECEDING AND CURRENT ROW) 
+AS 'running_average_for_10_matches'
+FROM ipl
+WHERE batter = 'V Kohli'
+GROUP BY ID;
+```
+
+## Percent of Total
